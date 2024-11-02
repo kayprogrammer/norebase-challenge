@@ -23,7 +23,14 @@ router = APIRouter()
     "/auth/login",
     tags=["Auth"],
     summary="Login a user",
-    description="This endpoint generates new token for a user",
+    description="""
+        ****
+        This endpoint generates new token for a user
+
+        Use any of the following credentials to login:
+        1. Email: johndoe@example.com | Password: johndoe
+        2. Email: janedoe@example.com | Password: janedoe
+    """,
     status_code=201,
 )
 async def login(
@@ -39,26 +46,30 @@ async def login(
         raise RequestError(err_msg="Invalid credentials", status_code=401)
 
     # Create auth token
-    token = await create_auth_token(user.id)
+    token = create_auth_token(user.id)
     return {
         "message": "Login successful",
         "data": {"token": token},
     }
 
 
-article_tags = ["Articles"],
+article_tags = (["Articles"],)
+
+
 @router.get(
     "/articles",
     tags=article_tags,
     summary="View all articles",
-    description="This endpoint allows people to view all existing articles",
+    description="""
+        ****
+        This endpoint allows people to view all existing articles
+    """,
     status_code=200,
 )
 async def articles_view(
     db: AsyncSession = Depends(get_db),
 ) -> ArticlesResponseSchema:
-    articles = (await db.execute(select(Article))).scalars().all()
-
+    articles = (await db.execute(select(Article))).unique().scalars().all()
     return {
         "message": "Articles fetched successfully",
         "data": articles,
@@ -69,7 +80,10 @@ async def articles_view(
     "/articles/{slug:str}",
     tags=article_tags,
     summary="View a single article",
-    description="This endpoint allows people to view a single article detail",
+    description="""
+        ****
+        This endpoint allows people to view a single article details
+    """,
     status_code=200,
 )
 async def single_article_view(
@@ -77,8 +91,10 @@ async def single_article_view(
     db: AsyncSession = Depends(get_db),
 ) -> ArticleResponseSchema:
     article = (
-        await db.execute(select(Article).where(Article.slug == slug))
-    ).scalar_one_or_none()
+        (await db.execute(select(Article).where(Article.slug == slug)))
+        .unique()
+        .scalar_one_or_none()
+    )
     if not article:
         raise RequestError(err_msg="Article does not exist!", status_code=404)
 
@@ -92,7 +108,11 @@ async def single_article_view(
     "/articles/{slug:str}/like",
     tags=article_tags,
     summary="Like an article",
-    description="This endpoint allows authenticated users to like an article",
+    description="""
+        ****
+        This endpoint allows authenticated users to like an article
+        Set token generated from the login endpoint in the authorize dialog field. 
+    """,
     status_code=200,
 )
 async def like_article(
@@ -101,8 +121,10 @@ async def like_article(
     db: AsyncSession = Depends(get_db),
 ) -> ResponseSchema:
     article = (
-        await db.execute(select(Article).where(Article.slug == slug))
-    ).scalar_one_or_none()
+        (await db.execute(select(Article).where(Article.slug == slug)))
+        .unique()
+        .scalar_one_or_none()
+    )
     if not article:
         raise RequestError(err_msg="Article does not exist!", status_code=404)
 
@@ -119,6 +141,6 @@ async def like_article(
         await db.commit()
     else:
         obj_to_create = Like(user_id=user.id, article_id=article.id)
-        await db.add(obj_to_create)
+        db.add(obj_to_create)
         await db.commit()
     return {"message": f"Like {message_substring} successfully"}

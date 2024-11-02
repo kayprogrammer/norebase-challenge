@@ -39,8 +39,8 @@ initd:
 tests:
 	pytest --disable-warnings -vv -x
 
-reqm:
+req:
 	pip install -r requirements.txt
 
-ureqm:
+ureq:
 	pip freeze > requirements.txt

@@ -1,5 +1,4 @@
 from datetime import datetime
-import random
 from sqlalchemy import (
     Column,
     DateTime,
@@ -7,14 +6,11 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
-    event,
-    select,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, relationship
-from .database import Base, SessionLocal
+from .database import Base
 import uuid
-from slugify import slugify
 
 
 class BaseModel(Base):
@@ -43,26 +39,14 @@ class Article(BaseModel):
     title: Mapped[str] = Column(String(500))
     slug: Mapped[str] = Column(String, unique=True, index=True)
     desc: Mapped[str] = Column(Text())
-    likes = relationship("Like", back_populates="article")
+    likes = relationship("Like", back_populates="article", lazy="joined")
 
     def __repr__(self):
         return self.title
 
-
-@event.listens_for(Article, "before_insert")
-async def before_insert_listener(mapper, connection, target):
-    base_slug = slugify(target.title)
-    slug = base_slug
-    # Generate unique slug before insert
-    async with SessionLocal() as session:
-        while True:
-            existing = (
-                await session.execute(select(Article).where(Article.slug == slug))
-            ).scalar_one_or_none()
-            if not existing:  # No collision found
-                break
-            slug = f"{base_slug}-{random.randint(100000, 999999)}"
-        target.slug = slug
+    @property
+    def likes_count(self):
+        return len(self.likes)
 
 
 class Like(BaseModel):

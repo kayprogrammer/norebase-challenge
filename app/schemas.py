@@ -1,10 +1,10 @@
-from ast import List
+from typing import List
 from pydantic import BaseModel, EmailStr, Field
 
 
 class LoginSchema(BaseModel):
     email: EmailStr = Field(..., example="johndoe@example.com")
-    password: str = Field(..., example="password")
+    password: str = Field(..., example="johndoe")
 
 
 class ResponseSchema(BaseModel):
@@ -24,7 +24,7 @@ class TokenResponseSchema(ResponseSchema):
 
 
 class ArticleSchema(BaseModel):
-    name: str
+    title: str
     slug: str
     desc: str
     likes_count: int

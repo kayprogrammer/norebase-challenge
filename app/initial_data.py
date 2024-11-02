@@ -32,8 +32,16 @@ async def create_initial_data(db: AsyncSession) -> None:
 
     # Create articles
     articles_to_create = [
-        {"title": "My article", "desc": "This is my first article that I love"},
-        {"title": "Cool article", "desc": "Have you seen this article on whatever"},
+        {
+            "title": "My article",
+            "slug": "my-article",
+            "desc": "This is my first article that I love",
+        },
+        {
+            "title": "Cool article",
+            "slug": "cool-article",
+            "desc": "Have you seen this article on whatever",
+        },
     ]
     await check_and_bulk_create_data(db, Article, articles_to_create)
     logger.info("Initial data created")

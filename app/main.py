@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.schemas import ResponseSchema
 from .conf import settings
 from .initial_data import create_initial_data
 from .routes import router
@@ -19,7 +21,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Norebase Challenge API",
     version="1.0.0",
-    description="An API with articles and likes feature",
+    description="""
+        An API with articles and likes feature.
+
+        Note:
+        - Provision for test users are available (login endpoint)
+        - I have a more sophisticated API similar to this: 
+            Realtime socialnet API - https://socialnet-express.fly.dev 
+            Github - https://github.com/kayprogrammer/socialnet-v7
+            
+    """,
     openapi_url=f"/openapi.json",
     docs_url="/",
     security=[{"BearerToken": []}],
@@ -48,6 +59,14 @@ app.add_middleware(
 app.include_router(router, prefix="/api/v1")
 
 
-@app.get("/api/v1/healthcheck", name="Healthcheck", tags=["Healthcheck"])
-async def healthcheck():
-    return {"success": "pong!"}
+@app.get(
+    "/api/v1/healthcheck",
+    name="Healthcheck",
+    tags=["Healthcheck"],
+    description="""
+        ****
+        Checks API Health
+    """,
+)
+async def healthcheck() -> ResponseSchema:
+    return {"message": "pong!"}

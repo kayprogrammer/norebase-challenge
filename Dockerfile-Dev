@@ -1,0 +1,30 @@
+FROM python:3.11-slim-buster
+
+RUN apt-get update
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+COPY ./release.sh /docker-entrypoint.d/release.sh
+
+RUN chmod +x /docker-entrypoint.d/release.sh
+
+RUN mkdir build
+
+# We create folder named build for our app.
+WORKDIR /build
+
+COPY ./app ./app
+COPY ./requirements.txt .
+COPY ./release.sh .
+COPY ./alembic.ini .
+
+# We copy our app folder to the /build
+
+RUN pip install -r requirements.txt
+
+RUN chmod +x ./release.sh
+
+CMD ["bash", "./release.sh"]
+
+ENV PYTHONPATH=/build
