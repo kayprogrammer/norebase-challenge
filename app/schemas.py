@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from pydantic import BaseModel, EmailStr, Field
 
@@ -28,6 +29,8 @@ class ArticleSchema(BaseModel):
     slug: str
     desc: str
     likes_count: int
+    created_at: datetime
+    updated_at: datetime
 
 
 class ArticlesResponseSchema(ResponseSchema):

@@ -110,7 +110,7 @@ async def single_article_view(
     summary="Like an article",
     description="""
         ****
-        This endpoint allows authenticated users to like an article
+        This endpoint allows authenticated users to like or unlike an article
         Set token generated from the login endpoint in the authorize dialog field. 
     """,
     status_code=200,
