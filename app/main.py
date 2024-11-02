@@ -23,7 +23,7 @@ app = FastAPI(
     version="1.0.0",
     description="""
         An API with articles and likes feature.
-
+        Github repository: https://github.com/kayprogrammer/norebase-challenge
         Note:
         - Provision for test users are available (login endpoint)
         - I have a more sophisticated API similar to this: 
